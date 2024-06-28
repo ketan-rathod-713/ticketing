@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ketan-rathod-713/authentication/service"
+	"github.com/ketan-rathod-713/ticketing/authentication/service"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

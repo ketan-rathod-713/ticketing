@@ -1,4 +1,4 @@
-module github.com/ketan-rathod-713/authentication
+module github.com/ketan-rathod-713/ticketing/authentication
 
 go 1.22.4
 

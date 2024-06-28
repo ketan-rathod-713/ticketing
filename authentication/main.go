@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ketan-rathod-713/authentication/api"
+	"github.com/ketan-rathod-713/ticketing/authentication/api"
 	"github.com/ketan-rathod-713/ticketing/core/databasemongo"
 )
 
