@@ -1,0 +1,16 @@
+apiVersion: skaffold/v3
+kind: Config
+metadata:
+  name: ticketing
+build:
+  local:
+    push: false
+  artifacts:
+    - image: ketanrtd1/auth
+      context: authentication
+      docker: 
+        dockerfile: Dockerfile
+      sync: 
+        manual:
+          - src: './*.go'
+            dest: .
