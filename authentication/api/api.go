@@ -5,17 +5,20 @@ import (
 	"github.com/ketan-rathod-713/ticketing/authentication/service"
 	"github.com/ketan-rathod-713/ticketing/core/jwthelper"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.uber.org/zap"
 )
 
 type api struct {
 	authService service.Service
-	jwtHelper   jwthelper.JWTHelper
+	JwtHelper   jwthelper.JWTHelper
+	Logger      *zap.SugaredLogger
 }
 
-func NewApi(client *mongo.Client) *api {
+func NewApi(client *mongo.Client, logger *zap.SugaredLogger) *api {
 	return &api{
-		authService: service.New(client.Database("authentication")),
-		jwtHelper:   jwthelper.New("secret"),
+		authService: service.New(client.Database("authentication"), logger),
+		JwtHelper:   jwthelper.New("secret"),
+		Logger:      logger,
 	}
 }
 

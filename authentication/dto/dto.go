@@ -16,3 +16,8 @@ type SigninReq struct {
 type SigninRes struct {
 	Success bool `json:"success"`
 }
+
+type SignupRes struct {
+	Success bool   `json:"success"`
+	Id      string `json:"id"`
+}

@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/ketan-rathod-713/ticketing/core/models"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.uber.org/zap"
 )
 
 type Service interface {
@@ -11,11 +12,13 @@ type Service interface {
 }
 
 type service struct {
-	DB *mongo.Database
+	DB     *mongo.Database
+	Logger *zap.SugaredLogger
 }
 
-func New(DB *mongo.Database) Service {
+func New(DB *mongo.Database, logger *zap.SugaredLogger) Service {
 	return &service{
-		DB: DB,
+		DB:     DB,
+		Logger: logger,
 	}
 }

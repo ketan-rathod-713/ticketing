@@ -1,23 +1,26 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"net/http"
+	"time"
 
 	"github.com/ketan-rathod-713/ticketing/authentication/api"
 	"github.com/ketan-rathod-713/ticketing/core/configs"
 	"github.com/ketan-rathod-713/ticketing/core/databasemongo"
+	coreLogger "github.com/ketan-rathod-713/ticketing/core/logger"
 )
 
 func main() {
+	logger := coreLogger.New()
+
 	// load env variables
 	config, err := configs.LoadConfigFronEnvFile()
 	if err != nil {
 		panic(fmt.Sprintf("unable to load configuration %v", err.Error()))
 	}
-
-	log.Println("Configuration loaded", config)
+	logger.Infof("configuration loaded %v", config)
 
 	// connect to database
 	client, err := databasemongo.Initialize()
@@ -25,12 +28,18 @@ func main() {
 		panic(err)
 	}
 
-	authApi := api.NewApi(client)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		panic(err)
+	}
+	logger.Infof("connected to mongodb database")
+
+	authApi := api.NewApi(client, logger)
 
 	r := authApi.InitializeRoutes()
 
-	log.Println("authentication service running on port 3000")
+	logger.Info("authentication service running on port 3000")
 	http.ListenAndServe(":3000", r)
 }
-
-// TODO: get env variables from .env file, what we will do in docker container ??

@@ -10,6 +10,7 @@ import (
 	"github.com/ketan-rathod-713/ticketing/core/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func (s *service) Signup(emailId string, password string, firstName string, lastName string) (*models.User, error) {
@@ -24,11 +25,14 @@ func (s *service) Signup(emailId string, password string, firstName string, last
 	var user models.User
 	err := result.Decode(&user)
 
-	if err != nil {
+	// if there are no documents in collection then move forward and do signup
+	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		s.Logger.Infof("error decoding model user got from database %v", err.Error())
 		return nil, err
 	}
 
 	if user.EmailId != "" {
+		s.Logger.Info("emailId already exists")
 		return nil, errors.New("emailId already exists")
 	}
 
@@ -43,16 +47,21 @@ func (s *service) Signup(emailId string, password string, firstName string, last
 
 	insertResult, err := s.DB.Collection("users").InsertOne(ctx, signupReq)
 	if err != nil {
+		s.Logger.Infof("error inserting signupReq into database %v", err.Error())
 		return nil, err
 	}
 
 	objId, ok := insertResult.InsertedID.(primitive.ObjectID)
 	if !ok {
+		s.Logger.Info("failed to get inserted object id")
 		return nil, errors.New("failed to get inserted object id")
 	}
 
 	// update id of user to inserted object id in mongodb
 	user.Id = objId
+	user.EmailId = emailId
+	user.FirstName = firstName
+	user.LastName = lastName
 
 	return &user, nil
 }

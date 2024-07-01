@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -45,12 +46,12 @@ func (a *api) Signup(ctx *gin.Context) {
 	userDB, err := a.authService.Signup(signupReq.EmailId, signupReq.Password, signupReq.FirstName, signupReq.LastName)
 
 	if err != nil {
-		ctx.JSON(500, models.GetResponse("error", nil, "internal error, unable to save user data to database"))
+		ctx.JSON(500, models.GetResponse("error", nil, fmt.Sprintf("internal error, %v", err.Error())))
 		ctx.Abort()
 		return
 	}
 
-	ctx.JSON(200, models.GetResponse("success", userDB, "user model fetched"))
+	ctx.JSON(200, models.GetResponse("success", dto.SignupRes{Success: true, Id: userDB.Id.Hex()}, "user model fetched"))
 }
 
 func (a *api) Signin(ctx *gin.Context) {
@@ -58,6 +59,7 @@ func (a *api) Signin(ctx *gin.Context) {
 	var signinReq dto.SigninReq
 	err := ctx.Bind(&signinReq)
 	if err != nil {
+		a.Logger.Infof("invalid signin request %v", err.Error())
 		ctx.JSON(400, models.GetResponse("error", nil, "invalid request"))
 		ctx.Abort()
 		return
@@ -66,7 +68,7 @@ func (a *api) Signin(ctx *gin.Context) {
 	// get user info
 	user, err := a.authService.GetUser(signinReq.EmailId)
 	if err != nil {
-		ctx.JSON(500, models.GetResponse("error", nil, "internal server error"))
+		ctx.JSON(500, models.GetResponse("error", nil, "internal server error", err.Error()))
 		ctx.Abort()
 		return
 	}
@@ -80,7 +82,6 @@ func (a *api) Signin(ctx *gin.Context) {
 
 	// TODO: set cookie in response
 	// generate jwt token
-	
 
 	// return userInfo
 	ctx.JSON(200, models.GetResponse("success", dto.SigninRes{Success: true}, "signed in"))
@@ -92,7 +93,7 @@ func (a *api) GetUserByEmailId(ctx *gin.Context) {
 }
 
 // get current user based on jwt token
-func(a *api) GetCurrentUser(ctx *gin.Context){
+func (a *api) GetCurrentUser(ctx *gin.Context) {
 
 }
 
