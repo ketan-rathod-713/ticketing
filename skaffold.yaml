@@ -7,9 +7,9 @@ build:
     push: false
   artifacts:
     - image: ketanrtd1/auth
-      context: authentication
+      context: .
       docker: 
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile.authentication
       sync: 
         manual:
           - src: './*.go'

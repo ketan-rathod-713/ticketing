@@ -2,13 +2,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-service
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
     - host: "ticketing.dev.ketan"
       http:
         paths:
-          - path: "/"
-            pathType: Prefix
+          - path: "/authentication(/|$)(.*)"
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: auth-srv

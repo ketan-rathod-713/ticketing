@@ -1,0 +1,17 @@
+FROM golang:1.22
+
+WORKDIR /usr/src/app
+
+# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
+
+COPY ./core ./core
+COPY ./authentication ./authentication
+COPY go.work . 
+
+RUN go build -v -o /usr/src/app/authentication ./authentication
+
+EXPOSE 3000
+
+WORKDIR /usr/src/app/authentication
+
+CMD [ "./authentication" ]
