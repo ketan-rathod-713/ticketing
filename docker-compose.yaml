@@ -1,0 +1,12 @@
+services:
+  postgres:
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_DB=ticketing
+      - POSTGRES_PASSWORD=rootpass
+    image: postgres:latest
+  
+  authentication:
+    depends_on:
+      - postgres
+    image: authentication

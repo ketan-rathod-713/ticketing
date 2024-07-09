@@ -20,6 +20,7 @@ type ServiceConfig struct {
 
 type AppConfig struct {
 	DomainName string `json:"domainName"`
+	AppEmailId string `json:"appEmailId"`
 }
 
 type DBConfig struct {

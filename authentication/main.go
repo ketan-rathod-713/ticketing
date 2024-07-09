@@ -14,16 +14,17 @@ import (
 
 func main() {
 	logger := coreLogger.New()
+	logger.Infof("logger initialized")
 
 	// load env variables
 	config, err := configs.LoadConfigFronEnvFile()
 	if err != nil {
 		panic(fmt.Sprintf("unable to load configuration %v", err.Error()))
 	}
-	logger.Infof("configuration loaded %v", config)
+	logger.Infof("configuration loaded from environment variable %v", config)
 
 	// connect to database
-	client, err := databasemongo.Initialize()
+	client, err := databasemongo.Initialize(config)
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +37,7 @@ func main() {
 	}
 	logger.Infof("connected to mongodb database")
 
-	authApi := api.NewApi(client, logger)
+	authApi := api.NewApi(client, logger, config)
 
 	r := authApi.InitializeRoutes()
 

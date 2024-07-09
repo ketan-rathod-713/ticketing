@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func (s *service) Signup(emailId string, password string, firstName string, lastName string) (*models.User, error) {
+func (s *service) Signup(emailId string, password string) (*models.User, error) {
 	log.Println("signup started")
 
 	// check if user already exists
@@ -38,11 +38,10 @@ func (s *service) Signup(emailId string, password string, firstName string, last
 
 	//TODO: save user to database and return it
 
-	var signupReq dto.SignupReq = dto.SignupReq{
-		EmailId:   emailId,
-		Password:  password,
-		FirstName: firstName,
-		LastName:  lastName,
+	var signupReq dto.SignupData = dto.SignupData{
+		EmailId:  emailId,
+		Password: password,
+		Role:     "user",
 	}
 
 	insertResult, err := s.DB.Collection("users").InsertOne(ctx, signupReq)
@@ -60,22 +59,37 @@ func (s *service) Signup(emailId string, password string, firstName string, last
 	// update id of user to inserted object id in mongodb
 	user.Id = objId
 	user.EmailId = emailId
-	user.FirstName = firstName
-	user.LastName = lastName
 
 	return &user, nil
 }
 
-func (s *service) GetUser(emailId string) (user *models.User, err error) {
+func (s *service) GetUser(emailId string) (*models.User, error) {
 
-	// TODO: get user from database
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	user = &models.User{
-		EmailId:   emailId,
-		FirstName: "ketan",
-		LastName:  "rathod",
-		Password:  "1234",
+	result := s.DB.Collection("users").FindOne(ctx, bson.M{"emailId": emailId})
+
+	user := models.User{}
+	err := result.Decode(&user)
+	if err != nil {
+		return nil, err
 	}
 
-	return user, nil
+	return &user, nil
+}
+
+func (s *service) GetCurrentUser(emailId string) (*dto.UserInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result := s.DB.Collection("users").FindOne(ctx, bson.M{"emailId": emailId})
+
+	userInfo := dto.UserInfo{}
+	err := result.Decode(&userInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	return &userInfo, nil
 }
