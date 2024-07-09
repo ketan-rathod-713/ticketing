@@ -7,6 +7,9 @@
 ## Tasks to do
 - token based authentication // store token in mongodb database for verification from client 
 - role based access (user, Admin) // in future add casbin role authorization
+- complete auhentication service from udemy
+- don't do next js implementation, just copy paste the frontend code and try to understand it.
+- Nats server and client for event bus streaming (start and complete by next week)
 
 ## Dependencies
 
@@ -46,4 +49,3 @@ Above command will start all services in dev mode. Changing anything in code wil
 ## Postman Collection Api
 
 - https://api.postman.com/collections/19886801-1b30a4c6-b057-4943-8054-0b5299c57c41?access_key=
-
