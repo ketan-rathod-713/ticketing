@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func (s *service) Signup(emailId string, password string) (*models.User, error) {
+func (s *service) Signup(emailId string, password string, firstName string, lastName string) (*models.User, error) {
 	log.Println("signup started")
 
 	// check if user already exists
@@ -39,9 +39,12 @@ func (s *service) Signup(emailId string, password string) (*models.User, error) 
 	//TODO: save user to database and return it
 
 	var signupReq dto.SignupData = dto.SignupData{
-		EmailId:  emailId,
-		Password: password,
-		Role:     "user",
+		EmailId:         emailId,
+		Password:        password,
+		Role:            "user",
+		FirstName:       firstName,
+		LastName:        lastName,
+		IsEmailVerified: false,
 	}
 
 	insertResult, err := s.DB.Collection("users").InsertOne(ctx, signupReq)

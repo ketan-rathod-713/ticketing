@@ -42,7 +42,7 @@ func (a *api) Signup(ctx *gin.Context) {
 	err := ctx.Bind(&signupReq)
 
 	if err != nil {
-		ctx.JSON(400, models.GetResponse("error", nil, "invalid request"))
+		ctx.JSON(400, models.GetResponse("error", nil, "invalid request, sufficient data not provided"))
 		ctx.Abort()
 		return
 	}
@@ -58,7 +58,7 @@ func (a *api) Signup(ctx *gin.Context) {
 	}
 
 	// calling authservice to store user data to database
-	userDB, err := a.authService.Signup(signupReq.EmailId, signupReq.Password)
+	userDB, err := a.authService.Signup(signupReq.EmailId, signupReq.Password, signupReq.FirstName, signupReq.LastName)
 
 	if err != nil {
 		ctx.JSON(500, models.GetResponse("error", nil, fmt.Sprintf("internal error, %v", err.Error())))
@@ -158,4 +158,32 @@ func (a *api) Logout(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
 		"message": "success",
 	})
+}
+
+func (a *api) VerifyEmail(ctx *gin.Context) {
+	// get claims from the ctx
+
+	var userClaims *models.UserClaim = nil
+	if claims, exists := ctx.Get("user"); exists {
+		if val, ok := claims.(*models.UserClaim); ok {
+			userClaims = val
+		}
+	}
+
+	if userClaims == nil {
+		ctx.JSON(400, models.GetResponse("error", nil, "error getting user claims"))
+		ctx.Abort()
+		return
+	}
+
+	// call verification service to verify email by using the mail service
+
+	// TODO: call mail service to send verification email
+	ctx.JSON(200, models.GetResponse("success", nil, "verification email sent successfully"))
+}
+
+// user verification link will be redirected to this route
+func (a *api) UserVerificationEmailLink(ctx *gin.Context) {
+	// take query params to identify the potential user and the unique id's generated.
+
 }

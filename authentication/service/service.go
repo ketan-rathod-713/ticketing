@@ -8,7 +8,7 @@ import (
 )
 
 type Service interface {
-	Signup(emailId string, password string) (user *models.User, err error)
+	Signup(emailId string, password string, firstName string, lastName string) (user *models.User, err error)
 	GetUser(emailId string) (user *models.User, err error)
 	GetCurrentUser(emailId string) (userInfo *dto.UserInfo, err error)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/ketan-rathod-713/ticketing/authentication/service"
 	"github.com/ketan-rathod-713/ticketing/core/configs"
 	"github.com/ketan-rathod-713/ticketing/core/jwthelper"
+	"github.com/ketan-rathod-713/ticketing/core/models"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
 )
@@ -37,8 +38,13 @@ func (a *api) InitializeRoutes() *gin.Engine {
 	// user specific routes
 	r.POST("/signup", a.Signup)
 	r.POST("/signin", a.Signin)
+
+	// TODO: add token parser middleware to it
 	r.GET("/currentuser", a.GetCurrentUser)
 	r.GET("/logout", a.Logout)
+
+	// Todo: add token parser middleware to it
+	r.GET("/verifyEmail", a.TokenParser, a.VerifyEmail)
 
 	// admin routes
 	// TODO: delete user, get all users, get user info by email id
@@ -47,3 +53,28 @@ func (a *api) InitializeRoutes() *gin.Engine {
 }
 
 // TODO: authorization middleware
+// it will take token and parse it and pass the claims inside the gin context
+// middleware token parser
+func (a *api) TokenParser(ctx *gin.Context) {
+	// take token from cookie
+	token, err := ctx.Cookie("token")
+	if err != nil {
+		ctx.JSON(200, models.GetResponse("error", nil, "error getting cookie", err.Error()))
+		ctx.Abort()
+		return
+	}
+
+	// parse and validate the token
+	userClaims, err := a.JwtHelper.ParseAndValidateToken(token)
+	if err != nil {
+		ctx.JSON(200, models.GetResponse("error", nil, "jwt token validation failed. please generate new token.", err.Error()))
+		ctx.Abort()
+		return
+	}
+
+	// pass the claims to the context
+	ctx.Set("user", userClaims)
+
+	// call next function
+	ctx.Next()
+}
