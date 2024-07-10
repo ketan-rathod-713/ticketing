@@ -24,6 +24,7 @@ func main() {
 	logger.Infof("configuration loaded from environment variable %v", config)
 
 	// connect to database
+	logger.Info("trying to connect to database")
 	client, err := databasemongo.Initialize(config)
 	if err != nil {
 		panic(err)
@@ -37,8 +38,8 @@ func main() {
 	}
 	logger.Infof("connected to mongodb database")
 
+	logger.Info("initialize routes")
 	authApi := api.NewApi(client, logger, config)
-
 	r := authApi.InitializeRoutes()
 
 	logger.Info("authentication service running on port 3000")
