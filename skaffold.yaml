@@ -14,3 +14,11 @@ build:
         manual:
           - src: './*.go'
             dest: .
+    - image: ketanrtd1/client
+      context: .
+      docker: 
+        dockerfile: Dockerfile.client
+      sync: 
+        manual:
+          - src: '**/*.js'
+            dest: .
