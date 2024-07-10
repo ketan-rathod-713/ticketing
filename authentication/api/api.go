@@ -32,19 +32,21 @@ func NewApi(client *mongo.Client, logger *zap.SugaredLogger, config *configs.Con
 func (a *api) InitializeRoutes() *gin.Engine {
 	r := gin.Default()
 
+	rg := r.Group("/authentication")
+
 	// users routes
-	r.GET("/health", a.Health)
+	rg.GET("/health", a.Health)
 
 	// user specific routes
-	r.POST("/signup", a.Signup)
-	r.POST("/signin", a.Signin)
+	rg.POST("/signup", a.Signup)
+	rg.POST("/signin", a.Signin)
 
 	// TODO: add token parser middleware to it
-	r.GET("/currentuser", a.GetCurrentUser)
-	r.GET("/logout", a.Logout)
+	rg.GET("/currentuser", a.GetCurrentUser)
+	rg.GET("/logout", a.Logout)
 
 	// Todo: add token parser middleware to it
-	r.GET("/verifyEmail", a.TokenParser, a.VerifyEmail)
+	rg.GET("/verifyEmail", a.TokenParser, a.VerifyEmail)
 
 	// admin routes
 	// TODO: delete user, get all users, get user info by email id
